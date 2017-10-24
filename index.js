@@ -1,5 +1,9 @@
 const Koa = require('koa')
 const app = new Koa()
+const bodyParser = require('koa-bodyparser')
+
+//使用ctx.body解析中间件
+app.use(bodyParser())
 
 app.use(async (ctx) => {
     if (ctx.url === '/' && ctx.method === 'GET') {
@@ -17,7 +21,7 @@ app.use(async (ctx) => {
         ctx.body = html
     } else if (ctx.url === '/' && ctx.method === 'POST') {
         //post请求时，解析表单里数据，并显示
-        let postData = await parsePostData(ctx)
+        let postData = ctx.request.body
         ctx.body = postData
     } else {
         //其他请求显示404
@@ -25,36 +29,6 @@ app.use(async (ctx) => {
     }
 })
 
-//解析上下文里node原生请求的post参数
-function parsePostData(ctx) {
-    return new Promise((resolve, reject) => {
-        try {
-            let postData = '';
-            ctx.req.addListener('data', (data) => {
-                postData += data
-            })
-            ctx.req.addListener('end', () => {
-                let parseData = parseQueryStr(postData)
-                resolve(parseData)
-            })
-        } catch (err) {
-            reject(err)
-        }
-    })
-}
-
-//将post请求参数字符串解析成JSON
-function parseQueryStr(queryStr) {
-    let queryData = {}
-    let queryStrList = queryStr.split('&')
-    console.log(queryStrList)
-    for (let [index, queryStr] of queryStrList.entries()) {
-        let itemList = queryStr.split('=')
-        queryData[itemList[0]] = decodeURIComponent(itemList[1])
-    }
-    return queryData
-}
-
 app.listen(3000, () => {
-    console.log('[demo] post request is starting on port: 3000')
+    console.log('[demo] koa-bodyparser is starting on port: 3000')
 })
