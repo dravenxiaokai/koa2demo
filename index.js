@@ -1,38 +1,21 @@
-const inspect = require('util').inspect
+const Koa = require('koa')
+const views = require('koa-views')
 const path = require('path')
-const fs = require('fs')
-const Busboy = require('busboy')
 
-//req为node原生请求
-const busboy = new Busboy({ headers: req.headers })
+const app = new Koa()
 
-//监听文件解析事件
-busboy.on('file', function (fieldname, file, filename, encoding, mimetype) {
-    console.log(`File [${fieldname}]: filename: ${filename}`)
+//加载模板引擎
+app.use(views(path.join(__dirname, './views'), {
+    extension: 'ejs'
+}))
 
-    //文件保存特定路径
-    file.pipe(fs.createWriteStream('./upload'))
-
-    //开始解析文件流
-    file.on('data', (data) => {
-        console.log(`File [${fieldname}] got ${data.length} bytes`)
-    })
-
-    //解析文件结束
-    file.on('end', () => {
-        console.log(`File [${fieldname}] finished`)
+app.use(async (ctx) => {
+    let title = 'hello koa@2'
+    await ctx.render('index', {
+        title
     })
 })
 
-//监听请求中的字段
-busboy.on('field', (fieldname, val, fieldnameTruncated, valTruncated) => {
-    console.log(`Field [${fieldname}]: value: ${inspect(val)}`)
+app.listen(3000, () => {
+    console.log('[demo] koa-views ejs is starting on port: 3000')
 })
-
-//监听结束事件
-busboy.on('finish', () => {
-    console.log('Done parsing form!')
-    res.writeHead(303, { Connection: 'close', Location: '/' })
-    res.end()
-})
-req.pipe(busboy)
