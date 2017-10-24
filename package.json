@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/dravenxiaokai/koa2demo#readme",
   "dependencies": {
+    "busboy": "^0.2.14",
     "ejs": "^2.5.7",
     "koa": "^2.3.0",
     "koa-bodyparser": "^4.2.0",
