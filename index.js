@@ -1,50 +1,19 @@
-const Koa = require('koa')
-const views = require('koa-views')
-const path = require('path')
-const convert = require('koa-convert')
-const static = require('koa-static')
-const { uploadFile } = require('./util/upload')
-const app = new Koa()
+const mysql = require('mysql')
 
-/**
-* 使用第三方中间件 start 
-*/
-app.use(views(path.join(__dirname, './views'), {
-    extension: 'ejs'
-}))
-
-// 静态资源目录对于相对入口文件index.js的路径 
-const staticPath = './public'
-// 由于koa-static目前不支持koa2 
-// 所以只能用koa-convert封装一下 
-app.use(convert(static(path.join(__dirname, staticPath))))
-
-/**
-* 使用第三方中间件 end 
-*/
-app.use(async (ctx) => {
-    if (ctx.method === 'GET') {
-        let title = 'upload pic async'
-        await ctx.render('index', {
-            title,
-        })
-    }
-    else if (ctx.url === '/api/picture/upload.json' && ctx.method === 'POST') {
-        // 上传文件请求处理 
-        let result = { success: false }
-        let serverFilePath = path.join(__dirname, 'public/image')
-        // 上传文件事件 
-        result = await uploadFile(ctx, {
-            fileType: 'album',
-            path: serverFilePath
-        })
-        ctx.body = result
-    } else {
-        // 其他请求显示404
-        ctx.body = '<h1>404！！！ o(╯□╰)o</h1>'
-    }
+//创建数据连接池
+const pool = mysql.createPool({
+    host: '127.0.0.1',
+    user: 'root',
+    password: 'root',
+    database: 'koademo'
 })
 
-app.listen(3000, () => {
-    console.log('[demo] upload-async is starting at port 3000')
+//在数据池中进行会话操作
+pool.getConnection((err, conn) => {
+    conn.query('SELECT * FROM test', (err, rs, fields) => {
+        //结束会话
+        conn.release()
+
+        if (err) throw err
+    })
 })
