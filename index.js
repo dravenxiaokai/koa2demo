@@ -1,19 +1,14 @@
-const mysql = require('mysql')
+const { query } = require('./async-db')
 
-//创建数据连接池
-const pool = mysql.createPool({
-    host: '127.0.0.1',
-    user: 'root',
-    password: 'root',
-    database: 'koademo'
-})
+async function selectAllData() {
+    let sql = 'SELECT * FROM test'
+    let dataList = await query(sql)
+    return dataList
+}
 
-//在数据池中进行会话操作
-pool.getConnection((err, conn) => {
-    conn.query('SELECT * FROM test', (err, rs, fields) => {
-        //结束会话
-        conn.release()
+async function getData() {
+    let dataList = await selectAllData()
+    console.log(dataList)
+}
 
-        if (err) throw err
-    })
-})
+getData()
