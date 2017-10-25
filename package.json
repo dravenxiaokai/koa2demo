@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/dravenxiaokai/koa2demo#readme",
   "dependencies": {
-    "koa": "^2.3.0"
+    "koa": "^2.3.0",
+    "koa-jsonp": "^2.0.2"
   }
 }
